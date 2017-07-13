@@ -111,7 +111,8 @@ void Menu::userLogon() {
 
 bool Menu::isUser(string username) {
     ifstream inStream;
-    inStream.open(username + ".txt");
+    string filename = username + ".txt";
+    inStream.open(filename.c_str());
     return inStream.good();
 //    if (inStream.fail()) {
 //        return false;
@@ -187,7 +188,8 @@ void Menu::displayWall() {
     createWelcome(banner);
     string fileMessages; //copy of the messageBuffer
     ifstream inStream;
-    inStream.open(currentUser.getUsername() + ".txt");
+    string filename = currentUser.getUsername() + ".txt";
+    inStream.open(filename.c_str());
     getline(inStream, fileMessages);
     WallPage wall; //instantiates a WallPage for the current user
     wall.createWallPage(fileMessages, userMessages); //finds the User's own messages
@@ -231,21 +233,24 @@ void Menu::displayHome() {
     string current;
     for (; s >> current;) {
         if (current == currentUser.getUsername()) {
-            ifstream inStream(currentUser.getUsername() + ".txt");
+            string filename = currentUser.getUsername() + ".txt";
+            ifstream inStream(filename);
             string messages;
             getline(inStream, messages);
             home.getUserMessages(messages, currentUser, userMessages);
             inStream.close();
         }
         else if (currentUser.isFriend(current)) {
-            ifstream inStream(current + ".txt");
+            string filename = current + ".txt";
+            ifstream inStream(filename.c_str());
             string messages;
             getline(inStream, messages);
             home.getFriendMessages(messages, current, userMessages);
             inStream.close();
         }
         else {
-            ifstream inStream(current + ".txt");
+            string filename = current + ".txt";
+            ifstream inStream(filename.c_str());
             string messages;
             getline(inStream, messages);
             home.getHashtagMessages(messages, current, currentUser, userMessages);

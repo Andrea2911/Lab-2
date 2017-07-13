@@ -11,12 +11,15 @@ using namespace std;
 // Description: Assigns the given username to the field name.
 User::User(string username) {
     name = username;
+    string filename = username + ".txt";
     ofstream outStream;
-    outStream.open(username + ".txt", ios::app);
+    outStream.open(filename.c_str(), ios::app);
     outStream.close();
-    outStream.open(username + ".Friends.txt", ios::app);
+    filename = username + ".Friends.txt";
+    outStream.open(filename.c_str(), ios::app);
     outStream.close();
-    outStream.open(username + ".Hashtags.txt", ios::app);
+    filename = username + "Hashtags.txt";
+    outStream.open(filename.c_str(), ios::app);
     outStream.close();
 }
 
@@ -33,7 +36,8 @@ string User::getUsername() {
 void User::addFriend(string newFriend) {
     if (!isFriend(newFriend)) {
         ofstream outStream;
-        outStream.open(getUsername() + ".Friends.txt", ios::app);
+        string filename = getUsername() + ".Friends.txt";
+        outStream.open(filename.c_str(), ios::app);
         outStream << newFriend + "\n";
         outStream.close();
     }
@@ -45,7 +49,8 @@ void User::addFriend(string newFriend) {
 // Description: Determines whether a given name is a friend of the User.
 bool User::isFriend(string username) {
     ifstream inStream;
-    inStream.open(getUsername() + ".Friends.txt");
+    string filename = getUsername() + ".Friends.txt";
+    inStream.open(filename.c_str());
 //    if (inStream.fail()) {
 //        return false;
 //    }
@@ -53,28 +58,32 @@ bool User::isFriend(string username) {
         string nextFriend;
         getline(inStream, nextFriend);
         if (nextFriend == username) {
+            inStream.close();
             return true;
         }
     }
+    inStream.close();
     return false;
 }
 
 string User::getHashtags() {
-    string username = getUsername();
-    ifstream inStream(username + ".Hashtags.txt");
+    string filename = getUsername() + ".Hashtags.txt";
+    ifstream inStream(filename);
     string friends = "";
     while (!inStream.eof()) {
         string nextFriend;
         getline(inStream, nextFriend);
         friends += nextFriend + " ";
     }
+    inStream.close();
     return friends;
 }
 
 void User::addHashtag(std::string hashtag) {
     if (!followsHashtag(hashtag)) {
         ofstream outStream;
-        outStream.open(getUsername() + ".Hashtags.txt", ios::app);
+        string filename = getUsername() + ".Hashtags.txt";
+        outStream.open(filename, ios::app);
         outStream << hashtag + "\n";
         outStream.close();
     }
@@ -82,14 +91,17 @@ void User::addHashtag(std::string hashtag) {
 
 bool User::followsHashtag(std::string hash) {
     ifstream inStream;
-    inStream.open(getUsername() + ".Hashtags.txt");
+    string filename = getUsername() + ".Hashtags.txt";
+    inStream.open(filename);
     while (!inStream.eof()) {
         string nextHash;
         getline(inStream, nextHash);
         if (nextHash == hash) {
+            inStream.close();
             return true;
         }
     }
+    inStream.close();
     return false;
 }
 
@@ -101,8 +113,8 @@ bool User::operator<(const User& right) const {
 
 void User::addMessage(std::string message) {
     ofstream outStream;
-    string username = getUsername();
-    outStream.open(username + ".txt", ios::app);
+    string filename = getUsername() + ".txt";
+    outStream.open(filename, ios::app);
     outStream << message;
     outStream.close();
 }
