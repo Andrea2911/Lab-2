@@ -68,7 +68,7 @@ bool User::isFriend(string username) {
 
 string User::getHashtags() {
     string filename = getUsername() + ".Hashtags.txt";
-    ifstream inStream(filename);
+    ifstream inStream(filename.c_str());
     string friends = "";
     while (!inStream.eof()) {
         string nextFriend;
@@ -83,7 +83,7 @@ void User::addHashtag(std::string hashtag) {
     if (!followsHashtag(hashtag)) {
         ofstream outStream;
         string filename = getUsername() + ".Hashtags.txt";
-        outStream.open(filename, ios::app);
+        outStream.open(filename.c_str(), ios::app);
         outStream << hashtag + "\n";
         outStream.close();
     }
@@ -92,7 +92,7 @@ void User::addHashtag(std::string hashtag) {
 bool User::followsHashtag(std::string hash) {
     ifstream inStream;
     string filename = getUsername() + ".Hashtags.txt";
-    inStream.open(filename);
+    inStream.open(filename.c_str());
     while (!inStream.eof()) {
         string nextHash;
         getline(inStream, nextHash);
@@ -114,7 +114,7 @@ bool User::operator<(const User& right) const {
 void User::addMessage(std::string message) {
     ofstream outStream;
     string filename = getUsername() + ".txt";
-    outStream.open(filename, ios::app);
+    outStream.open(filename.c_str(), ios::app);
     outStream << message;
     outStream.close();
 }

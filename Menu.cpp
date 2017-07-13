@@ -159,7 +159,10 @@ void Menu::postMessage() {
     outStream << timestamp + 1;
     outStream.close();
     cout << "Enter message:" << endl;
-    string message = "{#" + to_string(timestamp) + "#}"; //The username is stored in the message buffer
+    stringstream ss;
+    ss << timestamp;
+    string time = ss.str();
+    string message = "{#" + time + "#}"; //The username is stored in the message buffer
     string line = "";
     while (true) {
         getline(cin, line);
@@ -234,7 +237,7 @@ void Menu::displayHome() {
     for (; s >> current;) {
         if (current == currentUser.getUsername()) {
             string filename = currentUser.getUsername() + ".txt";
-            ifstream inStream(filename);
+            ifstream inStream(filename.c_str());
             string messages;
             getline(inStream, messages);
             home.getUserMessages(messages, currentUser, userMessages);
