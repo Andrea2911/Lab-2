@@ -18,7 +18,7 @@ User::User(string username) {
     filename = username + ".Friends.txt";
     outStream.open(filename.c_str(), ios::app);
     outStream.close();
-    filename = username + "Hashtags.txt";
+    filename = username + ".Hashtags.txt";
     outStream.open(filename.c_str(), ios::app);
     outStream.close();
 }
