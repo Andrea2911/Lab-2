@@ -1,4 +1,4 @@
-// Lab 1:       War Eagle Chat System
+// Lab 2:       Distributed War Eagle Chat System
 // File:        Menu.cpp
 // Description: Class implementation of the Menu class.
 
@@ -19,22 +19,12 @@ void Menu::displayMenu() {
              << "Enter option: ";
         getline(cin, userChoice);
         cout << endl;
-        //If the usesuesr doesn't give any input.
+        //If the user doesn't give any input.
         if (userChoice.length() < 1) {
             cout << "No input was given, please choose one of the above options" << endl << endl;
             continue;
         }
         choiceChar = userChoice.at(0);
-        //If the user attempts to do anything other than create a user of quit when no users have been created.
-//        if (userList.size() == 0 && choiceChar != 'n' && choiceChar != 'q') {
-//            cout << "No users have been created." << endl << endl;
-//            continue;
-//        }
-        //If there is only one user and the user gives an input that requires multiple users.
-//        if (userList.size() == 1 && (choiceChar == 'c' || choiceChar == 'f')){
-//            cout << "Only one user has been created, please choose a different option." << endl << endl;
-//            continue;
-//        }
         switch (choiceChar) {
             case 'p':
                 postMessage();
@@ -62,39 +52,10 @@ void Menu::displayMenu() {
     }while(choiceChar != 'q');
 }
 
-//Function:     createUser
-//Description:  Creates a new user, using the username the user enters.
-//              The user is welcomed to the chat system and is added to the
-//              list of users.
-void Menu::createUser() {
-    string candidateUser; //The potential new user
-    bool validUser = false; //The potential user is assumed to be invalid until proven otherwise.
-    while (!validUser) {
-        cout << "Please enter user name: ";
-        cin >> candidateUser;
-        cin.ignore();
-        cout << endl;
-        //If the candidate User is already a created user, prompt the user for a different username
-        //until a valid one is given.
-        if (userList.find(User(candidateUser)) != userList.end()) {
-            cout << "Username " + candidateUser + " is already taken. Choose a different username." << endl << endl;
-            continue;
-        }
-        validUser = true;
-    }
-    User newUser(candidateUser);
-    currentUser = newUser; //Make the candidate user the current user
-    currentUser.addFriend(currentUser.getUsername()); //Make the current user a friend to himself
-    userList.insert(currentUser); //Add the new user to the list of users
-    string banner = "Welcome to War Eagle Chat System, " + currentUser.getUsername() + "!";
-    createWelcome(banner);
-
-}
-
 void Menu::userLogon() {
     string username;
 
-    cout << endl << "Please enter user name: ";
+    cout << "Please enter user name: ";
     cin >> username;
     cin.ignore();
     cout << endl;
@@ -174,7 +135,7 @@ void Menu::postMessage() {
         message += line + "&&";
     }
     cout << endl;
-    cout << string(100, '=') << endl;
+    createWelcome("New message added");
 }
 
 // Function:    displayWall
@@ -212,7 +173,7 @@ void Menu::displayWall() {
         cout << userMessages.at(i) << endl << endl;
         numDisplayed++;
     }
-    cout << string(100, '=') << endl;
+    createWelcome("End of " + currentUser.getUsername() + "'s Wall Page");
 }
 
 // Function:    displayHome
@@ -228,8 +189,6 @@ void Menu::displayHome() {
     std::set<string> userMessages;
     string banner = currentUser.getUsername() + "'s Home Page";
     createWelcome(banner);
-    string bufferCopy = messageBuffer;
-    string hashes = currentUser.findFollowedHashtags(hashtagBuffer, currentUser.getUsername());
     HomePage home;
     string users = getUsers();
     stringstream s(users);
@@ -265,7 +224,6 @@ void Menu::displayHome() {
     //iterate backwards of the messages relevant to the User and print them out
     set<string>::reverse_iterator rit;
     for (rit=userMessages.rbegin(); rit != userMessages.rend(); ++rit) {
-//    for (unsigned long i = userMessages.size() - 1; i != std::string::npos; i--) {
         if (numDisplayed == 2) {
             cout << "                       More messages? (yes/no): ";
             string answer;
@@ -274,14 +232,13 @@ void Menu::displayHome() {
                 break;
             }
         }
-//        cout << userMessages.at(i) << endl;
         string message = *rit;
         unsigned long timeStart = message.find(" ");
         message = message.substr(timeStart + 1, std::string::npos);
         cout << message << endl << endl;
         numDisplayed++;
     }
-    cout << string(100, '=') << endl;
+    createWelcome("End of " + currentUser.getUsername() + "'s Home Page");
 }
 
 //Function:     addFriends
@@ -305,7 +262,7 @@ void Menu::addFriends() {
         validUser = true;
     }
     currentUser.addFriend(candidateFriend);
-    cout << string(100, '=') << endl;
+    createWelcome("Added " + candidateFriend + " to Friend's List");
 }
 
 //Function:     followHash
@@ -339,14 +296,14 @@ void Menu::followHash() {
         }
     }
     currentUser.addHashtag(newHash);
-    cout << string(100, '=') << endl;
+    cout << endl;
 }
 
 //Function:     quit
 //Description:  Displays a closing message, and gracefully exits the program.
 void Menu::quit() {
     cout << string(10, ' ') << string(59, '=') << endl
-         << string(10, ' ') << "|         Thank you for using War Eagle Chat System        |" << endl
+         << string(10, ' ') << "|      Thank you for using the War Eagle Chat System      |" << endl
          << string(10, ' ') << string(59, '=') << endl;
 }
 
@@ -355,9 +312,15 @@ void Menu::quit() {
 //Description:  Creates a welcome banner with unique to each task and
 //              length of the current user's username.
 void Menu::createWelcome(string banner) {
-    banner = "|          " + banner + "          |";
-    unsigned long bannerLength = banner.length();
-    cout << string(10, ' ') << string(bannerLength, '=') << endl
+    string sides = string(59, '=');
+    unsigned long size = (57 - banner.length()) / 2;
+    if ((57 - banner.length()) % 2 != 0) {
+        banner = "|" + string(size + 1, ' ') + banner + string(size, ' ') + "|";
+    }
+    else {
+        banner = "|" + string(size, ' ') + banner + string(size, ' ') + "|";
+    }
+    cout << string(10, ' ') << sides << endl
          << string(10, ' ') << banner << endl
-         << string(10, ' ') << string(bannerLength, '=') << endl << endl;
+         << string(10, ' ') << sides << endl << endl;
 }

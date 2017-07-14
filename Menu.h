@@ -27,7 +27,6 @@ public:
     Menu() : currentUser("superuser") {}
 
     void displayMenu();
-    void createUser();
     bool isUser(string username);
     void postMessage();
     void displayWall();
@@ -40,10 +39,7 @@ public:
 
 
 private:
-    string messageBuffer;
     User currentUser;
-    set<User> userList;
-    string hashtagBuffer;
     string getUsers();
 };
 
