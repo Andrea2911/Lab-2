@@ -140,6 +140,7 @@ void Menu::postMessage() {
             if ((line.compare("#$") == 0)) {
                 message = message.substr(0, message.length() - 2);
                 if (message.find("{#") != std::string::npos || message.find("#}") != std::string::npos) {
+                    cout << "Messages cannot contain '{#' or '#', please enter a different message." << endl;
                     break;
                 }
                 message = "{#" + time + "#}" + message; //The timestamp is stored in the message
