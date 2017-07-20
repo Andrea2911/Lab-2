@@ -1,4 +1,4 @@
-// Lab 1:       War Eagle Chat System
+// Lab 2:       Distributed War Eagle Chat System
 // File:        HomePage.h
 // Description: Class definition of the HomePage class.
 
@@ -12,10 +12,9 @@ using namespace std;
 
 class HomePage {
 public:
-    void createHomePage(string messageBuffer, string hashtags, User user, set<string>& messages);
     void getUserMessages(string userMessages, User user, set<string>& messages);
     void getFriendMessages(string userMessages, string user, set<string>& messages);
-    void getHashtagMessages(string userMessages, string otherUser, User user, set<string>& messages);
+    void getHashtagMessages(string userMessages, string hashes, string otherUser, set<string>& messages);
 private:
     string addNewLines(string message);
 };

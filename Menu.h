@@ -1,4 +1,4 @@
-// Lab 1:       War Eagle Chat System
+// Lab 2:       Distributed War Eagle Chat System
 // File:        Menu.h
 // Description: Class definition of the Menu class.
 
@@ -19,15 +19,16 @@ using namespace std;
 
 // Class: Menu
 // Description: This class creates a Menu object which represents
-//              the menu of options for the  War Eagle Chat System.  This class
+//              the menu of options for the Distributed War Eagle Chat System.  This class
 //              handles the user's inputs and displays the output requested
 //              by the user.
 class Menu {
 public:
-    Menu() : currentUser("superuser") {}
+    Menu() : currentUser() {}
 
     void displayMenu();
     bool isUser(string username);
+    string getUsers();
     void postMessage();
     void displayWall();
     void displayHome();
@@ -40,7 +41,6 @@ public:
 
 private:
     User currentUser;
-    string getUsers();
 };
 
 

@@ -1,4 +1,4 @@
-// Lab 1:       War Eagle Chat System
+// Lab 2:       Distributed War Eagle Chat System
 // File:        WallPage.cpp
 // Description: Class implementation of the WallPage class.
 
@@ -27,6 +27,10 @@ void WallPage::createWallPage(string messageString, vector<string>& messages) {
     }
 }
 
+//Function:     addNewLines
+//Inputs:       a message string
+//Outputs:      formatted message string
+//Description:  takes a message and replaces all occurrences of "&&" with "\n"
 string WallPage::addNewLines(string message) {
     string updatedMessage = "";
     while (message.length() > 0) {

@@ -1,6 +1,6 @@
 // Lab 2:       Distributed War Eagle Chat System
 // File:        Menu.cpp
-// Description: Class implementation of the Menu class.
+// Description: Implementation of the Menu class.
 
 #include "Menu.h"
 
@@ -8,7 +8,7 @@ using namespace std;
 
 //Function:     displayMenu
 //Description:  Displays the menu for the War Eagle Chat system, giving
-//              the user eight different options for how to proceed.
+//              the user 6 different options for how to proceed.
 void Menu::displayMenu() {
     string userChoice; //the user's input
     char choiceChar; //the user's input as one character
@@ -52,13 +52,25 @@ void Menu::displayMenu() {
     }while(choiceChar != 'q');
 }
 
+//Function:     userLogon
+//Description:  Logs a user into the Distributed War Eagle Chat System.  If the user does not already exist,
+//              he is added to the Users.txt file.  The new or returning user is made the current user and
+//              welcomed to the chat system.
 void Menu::userLogon() {
     string username;
+    bool validName = false;
+    while (!validName) {
+        cout << "Please enter user name: ";
+        cin >> username;
+        cin.ignore();
+        cout << endl;
+        if (username.find("{#") != std::string::npos && username.find("#}") != std::string::npos) {
+            cout << "Usernames cannot contain '{#' or '#}', please enter a different username" << endl;
+            continue;
+        }
+        validName = true;
 
-    cout << "Please enter user name: ";
-    cin >> username;
-    cin.ignore();
-    cout << endl;
+    }
     if (!isUser(username)) {
         ofstream outStream;
         outStream.open("Users.txt", ios::app);
@@ -70,24 +82,21 @@ void Menu::userLogon() {
     createWelcome(banner);
 }
 
+//Function:     isUser
+//Inputs:       string username
+//Outputs:      boolean result of whether a name is a user or not
+//Description:  Determines whether a given username is a created user of the War Eagle Chat System.
 bool Menu::isUser(string username) {
     ifstream inStream;
     string filename = username + ".txt";
     inStream.open(filename.c_str());
     return inStream.good();
-//    if (inStream.fail()) {
-//        return false;
-//    }
-//    while (!inStream.eof()) {
-//        string user;
-//        getline(inStream, user);
-//        if (user == username) {
-//            return true;
-//        }
-//    }
-//    return false;
 }
 
+//Function:     getUsers
+//Outputs:      the users of the chat system
+//Description:  Searches the Users.txt file for the existing users and returns a string containing
+//              the users.
 string Menu::getUsers() {
     string users = "";
     ifstream inStream;
@@ -103,8 +112,8 @@ string Menu::getUsers() {
 
 // Function:    postMessage
 //Description:  Allows a user to post a multiline message.  To end the message,
-//              the user enters "#$". The message is appended to the message buffer
-//              in the form "(*user*)message".
+//              the user enters "#$". The message is appended to the user's file
+//              in the form "{#timestamp#}message".
 void Menu::postMessage() {
     ifstream inStream;
     ofstream outStream;
@@ -115,48 +124,57 @@ void Menu::postMessage() {
     int timestamp;
     inStream >> timestamp;
     inStream.close();
-
     outStream.open("timestamp.txt");
-    outStream << timestamp + 1;
+    outStream << timestamp + 1; //Write the incremented timestamp back to the timestamp file
     outStream.close();
-    cout << "Enter message:" << endl;
-    stringstream ss;
-    ss << timestamp;
-    string time = ss.str();
-    string message = "{#" + time + "#}"; //The username is stored in the message buffer
-    string line = "";
-    while (true) {
-        getline(cin, line);
-        if ((line.compare("#$") == 0)) {
-            message = message.substr(0, message.length() - 2);
-            currentUser.addMessage(message);
-            break;
+    bool validMessage = false;
+    while (!validMessage) {
+        cout << "Enter message:" << endl;
+        stringstream ss;
+        ss << timestamp;
+        string time = ss.str();
+        string message = "";
+        string line = "";
+        while (true) {
+            getline(cin, line);
+            if ((line.compare("#$") == 0)) {
+                message = message.substr(0, message.length() - 2);
+                if (message.find("{#") != std::string::npos && message.find("#}") != std::string::npos) {
+                    break;
+                }
+                message = "{#" + time + "#}" + message; //The timestamp is stored in the message
+                currentUser.addMessage(message);
+                validMessage = true;
+                break;
+            }
+            message += line + "&&";
         }
-        message += line + "&&";
+
     }
     cout << endl;
     createWelcome("New message added");
 }
 
 // Function:    displayWall
-// Description: Searches the message buffer for all of the user's own posts.
+// Description: Searches the current user's file for all of the user's own posts.
 //              Those messages are then printed to the console in reverse
 //              chronological order.  After two messages have been printed,
 //              the user is asked if they want to see more messages.  If yes,
 //              the rest of the user's messages are printed.  If no, no other
 //              messages are printed.
 void Menu::displayWall() {
-    string singleMessage; //a single message from the message buffer
+    string singleMessage; //a single message from the message file
     std::vector<string> userMessages; //vector of a User's messages
     string banner = currentUser.getUsername() + "'s Wall Page";
     createWelcome(banner);
-    string fileMessages; //copy of the messageBuffer
+    string fileMessages; //all of a user's messages
     ifstream inStream;
     string filename = currentUser.getUsername() + ".txt";
     inStream.open(filename.c_str());
-    getline(inStream, fileMessages);
+    getline(inStream, fileMessages); //get the user's messages
+    inStream.close();
     WallPage wall; //instantiates a WallPage for the current user
-    wall.createWallPage(fileMessages, userMessages); //finds the User's own messages
+    wall.createWallPage(fileMessages, userMessages); //creates a wall page for the user
 
     int numDisplayed = 0; //current number of messages printed
     //iterate backwards over the User's messages to be printed in reverse chronological order.
@@ -177,7 +195,7 @@ void Menu::displayWall() {
 }
 
 // Function:    displayHome
-// Description: Searches the message buffer for all of the user's own posts,
+// Description: Searches the all message files for all of the user's own posts,
 //              the user's friend's posts, and any posts with hashtags the user follows.
 //              Those messages are then printed to the console in reverse
 //              chronological order.  After two messages have been printed,
@@ -190,10 +208,13 @@ void Menu::displayHome() {
     string banner = currentUser.getUsername() + "'s Home Page";
     createWelcome(banner);
     HomePage home;
+    string hashes = currentUser.getHashtags(); //hashtags followed by the current user
     string users = getUsers();
     stringstream s(users);
     string current;
+    //iterate over all of the user's message files
     for (; s >> current;) {
+        //find the user's messages
         if (current == currentUser.getUsername()) {
             string filename = currentUser.getUsername() + ".txt";
             ifstream inStream(filename.c_str());
@@ -202,6 +223,7 @@ void Menu::displayHome() {
             home.getUserMessages(messages, currentUser, userMessages);
             inStream.close();
         }
+        //find the user's friend's messages
         else if (currentUser.isFriend(current)) {
             string filename = current + ".txt";
             ifstream inStream(filename.c_str());
@@ -210,12 +232,13 @@ void Menu::displayHome() {
             home.getFriendMessages(messages, current, userMessages);
             inStream.close();
         }
+        //find the user's hashtag messages
         else {
             string filename = current + ".txt";
             ifstream inStream(filename.c_str());
             string messages;
             getline(inStream, messages);
-            home.getHashtagMessages(messages, current, currentUser, userMessages);
+            home.getHashtagMessages(messages, hashes, current, userMessages);
             inStream.close();
         }
     }
@@ -244,7 +267,7 @@ void Menu::displayHome() {
 //Function:     addFriends
 //Description:  Prompts the user for a friend's username.  If the username
 //              is valid, a new friend is added to the current user's
-//              friend list.  If the username is invalid, the user is continually
+//              friends file.  If the username is invalid, the user is continually
 //              prompted until a valid username is entered.
 void Menu::addFriends() {
     bool validUser = false; //assumed to be given an invalid user until proven otherwise
@@ -259,6 +282,10 @@ void Menu::addFriends() {
             cout << candidateFriend + " is not a valid user." << endl << endl;
             continue;
         }
+        else if (currentUser.isFriend(candidateFriend)) {
+            cout << candidateFriend + " is already your friend." << endl << endl;
+        }
+
         validUser = true;
     }
     currentUser.addFriend(candidateFriend);
@@ -267,8 +294,7 @@ void Menu::addFriends() {
 
 //Function:     followHash
 //Description:  Prompts the user for a hashtag topic to follow.  If the hashtag
-//              did not exist, it is is added to the hashtag buffer.  The user is
-//              added to the followers of the hashtag.
+//              did not exist, it is is added to the user's hashtag file.
 void Menu::followHash() {
     bool validHash = false; //hashtag is assumed to be invalid until proven otherwise
     string newHash; //potential new hashtag to be followed
