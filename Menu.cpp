@@ -64,7 +64,7 @@ void Menu::userLogon() {
         cin >> username;
         cin.ignore();
         cout << endl;
-        if (username.find("{#") != std::string::npos && username.find("#}") != std::string::npos) {
+        if (username.find("{#") != std::string::npos || username.find("#}") != std::string::npos) {
             cout << "Usernames cannot contain '{#' or '#}', please enter a different username" << endl;
             continue;
         }
@@ -139,7 +139,7 @@ void Menu::postMessage() {
             getline(cin, line);
             if ((line.compare("#$") == 0)) {
                 message = message.substr(0, message.length() - 2);
-                if (message.find("{#") != std::string::npos && message.find("#}") != std::string::npos) {
+                if (message.find("{#") != std::string::npos || message.find("#}") != std::string::npos) {
                     break;
                 }
                 message = "{#" + time + "#}" + message; //The timestamp is stored in the message
