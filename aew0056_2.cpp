@@ -18,7 +18,7 @@
 // To compile this program, type:
 // "g++ aew0056_2.cpp User.cpp Menu.cpp WallPage.cpp HomePage.cpp -o aew0056_2.out"
 // and hit enter. Once the program compiles, type "./aew0056_2.out" and the program will
-// begin, prompting the user to enter a usernam.
+// begin, prompting the user to enter a username.
 //
 // Description: This program is a simple distributed chat messaging system
 //              that allows users to post messages, friend other users,
